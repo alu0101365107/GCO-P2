@@ -51,6 +51,32 @@ def Lematizar(document_file, corpus_file):
         document = document.replace('\n' + it + " ", '\n' + value + " ")
         document = document.replace(" " + it + " ", " " + value + " ")
         document = document.replace(" " + it + '\n', " " + value + '\n')
+
+def generateMatriz(document):
+    # Obtengo todas las palabras (columna)
+    words = document.replace('\n', ' ').split(' ')
+    # Elimino los espacion en las palabras [ a ] -> [a]    
+    for i in range(len(words)):
+        words[i] = words[i].strip()
+    # Elimino las palabras repetidas
+    words = np.unique(words)
+    # El primer elemento es un espacio en blanco, lo elimino
+    words = words[1:]
+    # Creo la matriz
+    result = []
+    # spliteo por los \n para obtener cada articulo y eliminamos el ultimo elemento que es un espacio en blanco
+    document = document.split('\n')[:-1]
+    for i in range(len(document)):
+        auxDoc = document[i].replace('\n', ' ').split(' ')
+        tmpMatriz = []
+        for j in range(len(words)):
+            contador = 0
+            for k in range(len(auxDoc)):
+                if words[j] == auxDoc[k].strip():
+                    contador += 1
+            tmpMatriz.append(contador)
+        result.append(tmpMatriz)
+    return result, words
 # def main():
     #
 
