@@ -1,6 +1,7 @@
 # Pactica de GCO pruebas de Jacob
 import numpy as np
 import json
+import math
 
 # Funcion que lee el documento
 def readDocument(document_file):
@@ -13,6 +14,8 @@ def ReadCorpus(corpus_file):
     with open(corpus_file, 'r') as file:
         corpus = json.load(file)
     return corpus
+
+
 
 # Funcion que limpia los documentos, quitandoles las stopWords
 def cleanDocuments(document, stop_words):
@@ -79,6 +82,22 @@ def writeDocument(document, name):
     with open(name, 'w') as file:
         file.write(document)
 
+def printMatriz(matriz):
+    for i in range(len(matriz)):
+        print(matriz[i])
+
+def TF(matriz):
+  matrizTF = []
+  for row in matriz:
+    auxMatrizTF = []
+    for value in row:
+      if value > 0:
+        auxMatrizTF.append(1 + math.log10(value))
+      else:
+        auxMatrizTF.append(0)
+    matrizTF.append(auxMatrizTF)
+  return matrizTF
+
 def main():
   document_file = "./documents-01.txt"
   corpus_file = "./corpus/corpus-en.txt"
@@ -89,5 +108,13 @@ def main():
   # Limpiamos el documento, es decir, le quitamos las stop_words y los ".", ",", ":", ";"
   document_clean = cleanDocuments(document_file, stop_words)
   lematizacion = Lematizar(document_clean, corpus_file)
-  # writeDocument(lematizacion, "document_lematizado.txt")
+  matriz, words = generateMatriz(lematizacion)
+  # Generamos la matriz TF
+  matrizTF = TF(matriz)
+  printMatriz(matrizTF)
+  # print(words[31])
 main()
+
+
+## Dried es la posision 31 de la matriz TF
+# El valor de Tf de dried debe de ser 
