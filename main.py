@@ -19,28 +19,68 @@ import json
 import operator
 import math
 
+def check_all_words_all_files(files):
+  for check_document, check_words in files.items():
+    for document, words, in files.items():
+      for word, count in words.items():
+        if not word in check_words:
+          files[check_document].update({word: 0})
+  return files
+
+def DFjson(files):
+  df_matrix = {}
+  for document, words in files.items():
+    for word, count in words.items():
+      if (word in df_matrix):
+        df_matrix.update({word: count + df_matrix[word]})
+      else:
+        df_matrix.update({word: count})
+  df_matrix = dict(sorted(df_matrix.items(), key=operator.itemgetter(1), reverse=True))
+  return df_matrix
 
 def TFJson(files):
   tf_matrix = {}
   tf_words = {}
   for document, words in files.items():
     for word, count in words.items():
-      tf_words.update({word: 1 + math.log10(count)})
+      if not (count == 0):
+        tf_words.update({word: 1 + math.log10(count)})
+      else:
+        tf_words.update({word: 0})
     tf_matrix.update({document: tf_words})
     tf_words = {}
   return tf_matrix
 
-def IDFJson(files):
+def IDFJson(files, df):
   itf_matrix = {}
   itf_words = {}
+  total = sum(df.values())
   for document, words in files.items():
-    total = sum(words.values())
     for word, count in words.items():
-      itf_words.update({word: math.log10(total/count)})
+      itf_words.update({word: math.log10(total/df[word])})
     itf_matrix.update({document: itf_words})
     itf_words = {}
   return itf_matrix
 
+def len_Vector(files):
+  lenVector= {}
+  value = 0
+  for document, words in files.items():
+    for word, count in words.items():
+      value += pow(count, 2)
+    lenVector[document] = math.sqrt(value)
+    value = 0
+  return lenVector
+
+def vector_normalice(files, vector):
+  vectorNormalice = {}
+  valuesNormalice = {}
+  for document, words in files.items():
+    for word, count in words.items():
+      valuesNormalice.update({word: count / vector[document]})
+    vectorNormalice.update({document: valuesNormalice})
+    valuesNormalice = {}
+  return vectorNormalice
 ## El DF es la suma de las veces que aparece esa palabra en todos los documentos
 # El IDF seria calcular el DF / 
 
@@ -73,32 +113,55 @@ if __name__ == "__main__":
     f = open(getattr(args, file), "r")
     for line in f.readlines():
       for word in line.lower().split(" "): #Ponemos todas minisculas y separamos la linea por espacios
-        if (word[-1] in special_chars):  #Comprobamos que el ultimo caracter de la palabra no sea especial
-          word = word[:-1]
-        if (len(word) > 2 and word[len(word) - 2] == "."):
-          word = word[:-2]
-        if not word in stop_words: #Si la palabra no esta en las de parada, metemos esa palabra
-          if word in lemma_dict: #Lematizamos si es necesario y tenemos la lematización para esa palabra
-            if lemma_dict[word] in allWords:
-              allWords[lemma_dict[word]] += 1
+        if (len(word)):
+          if (word[-1] in special_chars):  #Comprobamos que el ultimo caracter de la palabra no sea especial
+            word = word[:-1]
+          if (len(word) > 2 and word[len(word) - 2] == "."):
+            word = word[:-2]
+          if not word in stop_words: #Si la palabra no esta en las de parada, metemos esa palabra
+            if word in lemma_dict: #Lematizamos si es necesario y tenemos la lematización para esa palabra
+              if lemma_dict[word] in allWords:
+                allWords[lemma_dict[word]] += 1
+              else:
+                objectWord = {lemma_dict[word]: 1}
+                allWords.update(objectWord)
             else:
-              objectWord = {lemma_dict[word]: 1}
-              allWords.update(objectWord)
-          else:
-            if word in allWords:
-              allWords[word] += 1
-            else:
-              objectWord = {word: 1}
-              allWords.update(objectWord)
+              if word in allWords:
+                allWords[word] += 1
+              else:
+                objectWord = {word: 1}
+                allWords.update(objectWord)
     sortedAllWords =  dict(sorted(allWords.items(), key=operator.itemgetter(1), reverse=True))
     allFiles.update({getattr(args, file): sortedAllWords})
     allWords = {}
     f.close()
-  idf = IDFJson(allFiles)
-  for document, words in TFJson(allFiles).items():
-    print("El documento {} tiene las siguientes palabaras".format(document))
+  df = DFjson(allFiles)
+  allComplete = check_all_words_all_files(allFiles)
+
+  # for word, count in df.items():
+  #   print("La palabra {}, tiene un DF {}\n".format(word, count))
+  
+  print("Total de resultados {}".format(sum(df.values())))
+
+  vector_len = len_Vector(TFJson(allComplete))
+  vectorNormalice = vector_normalice(TFJson(allComplete), vector_len)
+  # for document, words in vectorNormalice.items():
+  #   for word, count in words.items():
+  #     print("La palabra {} tiene un value normalizado de {}\n".format(word, count))
+
+  unique_words = []
+  idf = IDFJson(allComplete, df)
+  result_file = open("resultado.txt", "w")
+  for document, words in TFJson(allComplete).items():
+    result_file.write("El documento {} tiene las siguientes palabaras:\n".format(document))
     for word, count in words.items():
-      print("La palabra {} aparece {} con un TF de {} y un IDF de {}".format(word, allFiles[document][word], round(count, 3), round(idf[document][word], 3)))
-    print()
+      if not word in unique_words:
+        unique_words.push(word)
+      result_file.write("\tLa palabra {} aparece {} con un TF de {}\n".format(word, allComplete[document][word], round(count, 3)))
+    result_file.write("\n")
+  for word in unique_words:
+    print("La palabra {} tiene un IDF {}".format(word, idf[word]))
+
+  result_file.close()
   # for line in lines:
   #   print(line)
