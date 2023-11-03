@@ -1,6 +1,7 @@
 import numpy as np
 import math
 
+
 # Funcion TF
 def TF(matriz):
   matrizTF = []
