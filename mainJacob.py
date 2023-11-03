@@ -4,7 +4,7 @@ import json
 
 # Funcion que lee el documento
 def readDocument(document_file):
-    with open('stop_words/stop-words-en.txt', 'r') as file:
+    with open(document_file, 'r') as file:
         content = file.read()
     return content
 
@@ -17,8 +17,7 @@ def ReadCorpus(corpus_file):
 # Funcion que limpia los documentos, quitandoles las stopWords
 def cleanDocuments(document, stop_words):
     # Leemos el documento y lo guardamos en una variable
-    with open(document, 'r') as file:
-        document = file.read()
+    document = readDocument(document)
     document = " " + document
     # Compruebo que si no tiene \n al final se lo añado, para saber en todo momento donde estan los articulos y pueda limpiar bien los documentos
     if not document.endswith("\n"):
@@ -35,22 +34,19 @@ def cleanDocuments(document, stop_words):
         document = document.replace(" " + stop_word + " ", " ")
         document = document.replace('\n' + stop_word + " ", "\n")
         document = document.replace(" " + stop_word + '\n', "\n")
-
     return document
-#documento = ("./documents-01.txt")
-#cleanDocuments(documento, stop_words)
 
 # Funcion que lematiza el documento, es decir coge la palabra que esta en el corpus y la sustituye por la que nos indica.
-def Lematizar(document_file, corpus_file):
-    with open(document_file, 'r') as input_file:
-        document = input_file.read()
-    with open(corpus_file, 'r') as file:
-        corpus = json.load(file)
+def Lematizar(document, corpus_file):
+    # Leemos el documento y el corpus
+    # document = readDocument(document_file)
+    corpus = ReadCorpus(corpus_file)
     # Hago un bucle que recorra el documento y si ve la palabra en el corpus la cambia por su valor
     for it, value in corpus.items():
         document = document.replace('\n' + it + " ", '\n' + value + " ")
         document = document.replace(" " + it + " ", " " + value + " ")
         document = document.replace(" " + it + '\n', " " + value + '\n')
+    return document
 
 def generateMatriz(document):
     # Obtengo todas las palabras (columna)
@@ -77,14 +73,21 @@ def generateMatriz(document):
             tmpMatriz.append(contador)
         result.append(tmpMatriz)
     return result, words
-# def main():
-    #
 
-#main()
+# Funcion write que guarda el docuemnto en un fichero.txt para poder visualizarlo
+def writeDocument(document, name):
+    with open(name, 'w') as file:
+        file.write(document)
 
-with open('stop_words/stop-words-en.txt', 'r') as file:
-    content = file.read()
-content = content.replace('\r', '')
-stop_words = content.split('\n')
-with open('corpus/corpus-en.txt', 'r') as file:
-    lematizacion = json.load(file)
+def main():
+  document_file = "./documents-01.txt"
+  corpus_file = "./corpus/corpus-en.txt"
+  stop_words_file = "./stop_words/stop-words-en.txt"
+  # Leemos las stop_words y lo dejamos limpio para trabajar con ellas
+  stop_words_read = readDocument(stop_words_file)
+  stop_words = stop_words_read.replace('\r', ' ').split('\n')
+  # Limpiamos el documento, es decir, le quitamos las stop_words y los ".", ",", ":", ";"
+  document_clean = cleanDocuments(document_file, stop_words)
+  lematizacion = Lematizar(document_clean, corpus_file)
+  # writeDocument(lematizacion, "document_lematizado.txt")
+main()
