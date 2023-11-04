@@ -99,7 +99,7 @@ def TF(matriz):
   return matrizTF
 
 def main():
-  document_file = "./documents-01.txt"
+  document_file = "./ejemplo.txt"
   corpus_file = "./corpus/corpus-en.txt"
   stop_words_file = "./stop_words/stop-words-en.txt"
   # Leemos las stop_words y lo dejamos limpio para trabajar con ellas
