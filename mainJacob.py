@@ -2,15 +2,17 @@
 import numpy as np
 import json
 import math
+import sys
+import argparse
 
 # Funcion que lee el documento
-def readDocument(document_file):
+def read_document(document_file):
     with open(document_file, 'r') as file:
         content = file.read()
     return content
 
 # Funcion que lee el corpus
-def ReadCorpus(corpus_file):
+def Read_corpus(corpus_file):
     with open(corpus_file, 'r') as file:
         corpus = json.load(file)
     return corpus
@@ -18,9 +20,9 @@ def ReadCorpus(corpus_file):
 
 
 # Funcion que limpia los documentos, quitandoles las stopWords
-def cleanDocuments(document, stop_words):
+def clean_documents(document, stop_words):
     # Leemos el documento y lo guardamos en una variable
-    document = readDocument(document)
+    document = read_document(document)
     document = " " + document
     # Compruebo que si no tiene \n al final se lo añado, para saber en todo momento donde estan los articulos y pueda limpiar bien los documentos
     if not document.endswith("\n"):
@@ -43,7 +45,7 @@ def cleanDocuments(document, stop_words):
 def Lematizar(document, corpus_file):
     # Leemos el documento y el corpus
     # document = readDocument(document_file)
-    corpus = ReadCorpus(corpus_file)
+    corpus = Read_corpus(corpus_file)
     # Hago un bucle que recorra el documento y si ve la palabra en el corpus la cambia por su valor
     for it, value in corpus.items():
         document = document.replace('\n' + it + " ", '\n' + value + " ")
@@ -51,7 +53,7 @@ def Lematizar(document, corpus_file):
         document = document.replace(" " + it + '\n', " " + value + '\n')
     return document
 
-def generateMatriz(document):
+def generate_matriz(document):
     # Obtengo todas las palabras (columna)
     words = document.replace('\n', ' ').split(' ')
     # Elimino los espacion en las palabras [ a ] -> [a]    
@@ -78,14 +80,15 @@ def generateMatriz(document):
     return result, words
 
 # Funcion write que guarda el docuemnto en un fichero.txt para poder visualizarlo
-def writeDocument(document, name):
+def write_document(document, name):
     with open(name, 'w') as file:
         file.write(document)
 
-def printMatriz(matriz):
+def print_matriz(matriz):
     for i in range(len(matriz)):
         print(matriz[i])
 
+# Funcion que genera la matriz TF, segun la formula dada en los apuntes
 def TF(matriz):
   matrizTF = []
   for row in matriz:
@@ -98,23 +101,86 @@ def TF(matriz):
     matrizTF.append(auxMatrizTF)
   return matrizTF
 
+# Funcion que genera la matriz IDF, segun la formula dada en los apuntes
+def idf(matriz_file):
+    N = len(matriz_file)
+    num_document = len(matriz_file[0])
+    # Inicializar un vector IDF con ceros
+    vector_idf = np.zeros(num_document)
+    for j in range(num_document):
+        # Contar cuántos documentos contienen el término en la columna j
+        document_with_term = sum(1 for i in range(N) if matriz_file[i][j] > 0)
+        if document_with_term > 0:
+            # Calcular el IDF y almacenarlo en el vector IDF
+            vector_idf[j] = math.log10(N / document_with_term)
+    return vector_idf
+
+def matriz_TF_IDF(matriz_tf, matriz_idf):
+    matriz_tfidf = matriz_tf * np.array(matriz_idf)
+    return matriz_tfidf
+
+
+def similarity_cos(documet1, document2):
+    value = 0
+    for i in range(len(documet1)):
+        value += documet1[i] * document2[i]
+    return value
+
+def comp_doc(normalized_matrix):
+  result = []
+  for i in range(len(normalized_matrix)):
+    for j in range(i + 1, len(normalized_matrix)):
+      result.append("Doc " + str(i + 1) + " con el " + str(j + 1) + ": " + format(similarity_cos(normalized_matrix[i], normalized_matrix[j]), ".4f"))
+  return result
+
+
+def len_vectors(matriz):
+    tmpMatriz = []
+    for i in range(len(matriz)):
+        value = 0
+        for j in range(len(matriz[i])):
+            value += matriz[i][j] ** 2
+        value = math.sqrt(value)
+        tmpMatriz.append(value)
+    return tmpMatriz
+
+def normalizar(matriz, len_vector):
+    result = []
+    for i in range(len(matriz)):
+      row = []
+      for j in range(len(matriz[i])):
+        row.append(matriz[i][j] / len_vector[i])
+      result.append(row)
+    return result
+
+
+# Main del programa
 def main():
-  document_file = "./ejemplo.txt"
-  corpus_file = "./corpus/corpus-en.txt"
-  stop_words_file = "./stop_words/stop-words-en.txt"
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--f', type=str, help='Nombre del fichero de lectura')
+  parser.add_argument('--c', type=str, help='Nombre del fichero que sera usado como corpus')
+  parser.add_argument('--s', type=str, help='Nombre del fichero con las stop words')
+  args = parser.parse_args(sys.argv[1:])
+
+#   document_file = "./ejemplo.txt"
+#   corpus_file = "./corpus/corpus-en.txt"
+#   stop_words_file = "./stop_words/stop-words-en.txt"
+  document_file = args.f
+  corpus_file = args.c
+  stop_words_file = args.s
   # Leemos las stop_words y lo dejamos limpio para trabajar con ellas
-  stop_words_read = readDocument(stop_words_file)
+  stop_words_read = read_document(stop_words_file)
   stop_words = stop_words_read.replace('\r', ' ').split('\n')
   # Limpiamos el documento, es decir, le quitamos las stop_words y los ".", ",", ":", ";"
-  document_clean = cleanDocuments(document_file, stop_words)
+  document_clean = clean_documents(document_file, stop_words)
   lematizacion = Lematizar(document_clean, corpus_file)
-  matriz, words = generateMatriz(lematizacion)
+  matriz, words = generate_matriz(lematizacion)
   # Generamos la matriz TF
-  matrizTF = TF(matriz)
-  printMatriz(matrizTF)
-  # print(words[31])
+  matriz_tf = TF(matriz)
+  matriz_idf = idf(matriz)
+  matriz_tf_idf = matriz_TF_IDF(matriz_tf, matriz_idf)
+  len_vector = len_vectors(matriz_tf)
+  matriz_normalizada = normalizar(matriz_tf, len_vector)
+  pares = comp_doc(matriz_normalizada)
+  print(pares)
 main()
-
-
-## Dried es la posision 31 de la matriz TF
-# El valor de Tf de dried debe de ser 
