@@ -1,167 +1,186 @@
-"""
-El software debe proporcionar como salida lo siguiente: 
-  - La matriz de utilidad con la predicción de los elementos faltantes en la matriz original.
-  - La similaridad entre cada usuario y sus vecinos de acuerdo a la métrica elegida.
-  - Los vecinos seleccionados en el proceso de predicción.
-  - El cálculo de cada predicción de la matriz de utilidad en base a los vecinos seleccionados.
-
-Como resultado de esta práctica debes entregar lo siguiente:
-  - Enlace a repositorio GitHub público con el código fuente del sistema recomendador implementado. Incluye en el README.md del repositorio:
-  - Instrucciones de instalación de dependencias, despliegue, etc. del software creado.
-  - Descripción del código desarrollado.
-  - Ejemplo de uso.
-  - Un informe en PDF describiendo el análisis realizado en varios ejemplos y las conclusiones extraídas.
-"""
-import sys
-#import functions
-import argparse
+# Pactica de GCO pruebas de Jacob
+import numpy as np
 import json
-import operator
 import math
+import sys
+import argparse
+import functions
 
-def check_all_words_all_files(files):
-  for check_document, check_words in files.items():
-    for document, words, in files.items():
-      for word, count in words.items():
-        if not word in check_words:
-          files[check_document].update({word: 0})
-  return files
+# Funcion que lee el documento
+def read_document(document_file):
+    with open(document_file, 'r') as file:
+        content = file.read()
+    return content
 
-def DFjson(files):
-  df_matrix = {}
-  for document, words in files.items():
-    for word, count in words.items():
-      if (word in df_matrix):
-        df_matrix.update({word: count + df_matrix[word]})
+
+# Funcion que lee el corpus
+def read_corpus(corpus_file):
+    with open(corpus_file, 'r') as file:
+        corpus = json.load(file)
+    return corpus
+
+
+# Funcion que limpia los documentos, quitandoles las stopWords
+def clean_documents(document, stop_words):
+    # Leemos el documento y lo guardamos en una variable
+    document = read_document(document)
+    document = " " + document
+    # Compruebo que si no tiene \n al final se lo añado, para saber en todo momento donde estan los articulos y pueda limpiar bien los documentos
+    if not document.endswith("\n"):
+        document += "\n"
+    # Eliminamos las , . : ; de los documentos
+    document = document.replace(',', '')
+    document = document.replace('.', '')
+    document = document.replace(':', '')
+    document = document.replace(';', '')
+    # Pasamos todas las palabras a minusculas
+    document = document.lower()
+    # Eliminamos las stopwords
+    for stop_word in stop_words:
+        document = document.replace(" " + stop_word + " ", " ")
+        document = document.replace('\n' + stop_word + " ", "\n")
+        document = document.replace(" " + stop_word + '\n', "\n")
+    return document
+
+# Funcion que lematiza el documento, es decir coge la palabra que esta en el corpus y la sustituye por la que nos indica.
+def Lematizar(document, corpus_file):
+    # Leemos el documento y el corpus
+    # document = readDocument(document_file)
+    corpus = functions.Read_corpus(corpus_file)
+    # Hago un bucle que recorra el documento y si ve la palabra en el corpus la cambia por su valor
+    for it, value in corpus.items():
+        document = document.replace('\n' + it + " ", '\n' + value + " ")
+        document = document.replace(" " + it + " ", " " + value + " ")
+        document = document.replace(" " + it + '\n', " " + value + '\n')
+    return document
+
+def generate_matriz(document):
+    # Obtengo todas las palabras (columna)
+    words = document.replace('\n', ' ').split(' ')
+    # Elimino los espacion en las palabras [ a ] -> [a]    
+    for i in range(len(words)):
+        words[i] = words[i].strip()
+    # Elimino las palabras repetidas
+    words = np.unique(words)
+    # El primer elemento es un espacio en blanco, lo elimino
+    words = words[1:]
+    # Creo la matriz
+    result = []
+    # spliteo por los \n para obtener cada articulo y eliminamos el ultimo elemento que es un espacio en blanco
+    document = document.split('\n')[:-1]
+    for i in range(len(document)):
+        auxDoc = document[i].replace('\n', ' ').split(' ')
+        tmpMatriz = []
+        for j in range(len(words)):
+            contador = 0
+            for k in range(len(auxDoc)):
+                if words[j] == auxDoc[k].strip():
+                    contador += 1
+            tmpMatriz.append(contador)
+        result.append(tmpMatriz)
+    return result, words
+
+# Funcion write que guarda el docuemnto en un fichero.txt para poder visualizarlo
+def write_document(document, name):
+    with open(name, 'w') as file:
+        file.write(document)
+
+def print_matriz(matriz):
+    for i in range(len(matriz)):
+        print(matriz[i])
+
+# Funcion que genera la matriz TF, segun la formula dada en los apuntes
+def TF(matriz):
+  matrizTF = []
+  for row in matriz:
+    auxMatrizTF = []
+    for value in row:
+      if value > 0:
+        auxMatrizTF.append(1 + math.log10(value))
       else:
-        df_matrix.update({word: count})
-  df_matrix = dict(sorted(df_matrix.items(), key=operator.itemgetter(1), reverse=True))
-  return df_matrix
+        auxMatrizTF.append(0)
+    matrizTF.append(auxMatrizTF)
+  return matrizTF
 
-def TFJson(files):
-  tf_matrix = {}
-  tf_words = {}
-  for document, words in files.items():
-    for word, count in words.items():
-      if not (count == 0):
-        tf_words.update({word: 1 + math.log10(count)})
-      else:
-        tf_words.update({word: 0})
-    tf_matrix.update({document: tf_words})
-    tf_words = {}
-  return tf_matrix
+# Funcion que genera la matriz IDF, segun la formula dada en los apuntes
+def idf(matriz_file):
+    N = len(matriz_file)
+    num_document = len(matriz_file[0])
+    # Inicializar un vector IDF con ceros
+    vector_idf = np.zeros(num_document)
+    for j in range(num_document):
+        # Contar cuántos documentos contienen el término en la columna j
+        document_with_term = sum(1 for i in range(N) if matriz_file[i][j] > 0)
+        if document_with_term > 0:
+            # Calcular el IDF y almacenarlo en el vector IDF
+            vector_idf[j] = math.log10(N / document_with_term)
+    return vector_idf
 
-def IDFJson(files, df):
-  itf_matrix = {}
-  itf_words = {}
-  total = sum(df.values())
-  for document, words in files.items():
-    for word, count in words.items():
-      itf_words.update({word: math.log10(total/df[word])})
-    itf_matrix.update({document: itf_words})
-    itf_words = {}
-  return itf_matrix
+def matriz_TF_IDF(matriz_tf, matriz_idf):
+    matriz_tfidf = matriz_tf * np.array(matriz_idf)
+    return matriz_tfidf
 
-def len_Vector(files):
-  lenVector= {}
-  value = 0
-  for document, words in files.items():
-    for word, count in words.items():
-      value += pow(count, 2)
-    lenVector[document] = math.sqrt(value)
+
+def similarity_cos(documet1, document2):
     value = 0
-  return lenVector
+    for i in range(len(documet1)):
+        value += documet1[i] * document2[i]
+    return value
 
-def vector_normalice(files, vector):
-  vectorNormalice = {}
-  valuesNormalice = {}
-  for document, words in files.items():
-    for word, count in words.items():
-      valuesNormalice.update({word: count / vector[document]})
-    vectorNormalice.update({document: valuesNormalice})
-    valuesNormalice = {}
-  return vectorNormalice
-## El DF es la suma de las veces que aparece esa palabra en todos los documentos
-# El IDF seria calcular el DF / 
+def comp_doc(normalized_matrix):
+  result = []
+  for i in range(len(normalized_matrix)):
+    for j in range(i + 1, len(normalized_matrix)):
+      result.append("Doc " + str(i + 1) + " con el " + str(j + 1) + ": " + format(similarity_cos(normalized_matrix[i], normalized_matrix[j]), ".4f"))
+  return result
 
 
-#### Programa principal ####
-if __name__ == "__main__":
+def len_vectors(matriz):
+    tmpMatriz = []
+    for i in range(len(matriz)):
+        value = 0
+        for j in range(len(matriz[i])):
+            value += matriz[i][j] ** 2
+        value = math.sqrt(value)
+        tmpMatriz.append(value)
+    return tmpMatriz
+
+def normalizes(matriz, len_vector):
+    result = []
+    for i in range(len(matriz)):
+      row = []
+      for j in range(len(matriz[i])):
+        row.append(matriz[i][j] / len_vector[i])
+      result.append(row)
+    return result
+   
+# Main del programa
+def main():
   parser = argparse.ArgumentParser()
   parser.add_argument('--f', type=str, help='Nombre del fichero de lectura')
-  parser.add_argument('--f2', type=str, help='Nombre del fichero de lectura')
+  parser.add_argument('--c', type=str, help='Nombre del fichero que sera usado como corpus')
+  parser.add_argument('--s', type=str, help='Nombre del fichero con las stop words')
   args = parser.parse_args(sys.argv[1:])
 
-  special_chars = [',', '?', ':', '.', ";", "%"]
-
-  file_stop_words = open('stop_words/stop-words-en.txt')
-  stop_words = [word for word in file_stop_words.readlines()]
-  file_stop_words.close()
-
-  
-  with open('corpus/corpus-en.txt', "r") as file  :
-    lemma_dict = json.load(file)
-  # for word, lemma in lemma_dict.items():
-    # print('Palabra {} se convierte en {}'.format(word, lemma))
-  #   lemma_dict[word] = lemma
-  # for value in lemma_dict:
-  #   print(value)
-
-  allWords = {}
-  allFiles = {}
-  for file in vars(args):
-    f = open(getattr(args, file), "r")
-    for line in f.readlines():
-      for word in line.lower().split(" "): #Ponemos todas minisculas y separamos la linea por espacios
-        if (len(word)):
-          if (word[-1] in special_chars):  #Comprobamos que el ultimo caracter de la palabra no sea especial
-            word = word[:-1]
-          if (len(word) > 2 and word[len(word) - 2] == "."):
-            word = word[:-2]
-          if not word in stop_words: #Si la palabra no esta en las de parada, metemos esa palabra
-            if word in lemma_dict: #Lematizamos si es necesario y tenemos la lematización para esa palabra
-              if lemma_dict[word] in allWords:
-                allWords[lemma_dict[word]] += 1
-              else:
-                objectWord = {lemma_dict[word]: 1}
-                allWords.update(objectWord)
-            else:
-              if word in allWords:
-                allWords[word] += 1
-              else:
-                objectWord = {word: 1}
-                allWords.update(objectWord)
-    sortedAllWords =  dict(sorted(allWords.items(), key=operator.itemgetter(1), reverse=True))
-    allFiles.update({getattr(args, file): sortedAllWords})
-    allWords = {}
-    f.close()
-  df = DFjson(allFiles)
-  allComplete = check_all_words_all_files(allFiles)
-
-  # for word, count in df.items():
-  #   print("La palabra {}, tiene un DF {}\n".format(word, count))
-  
-  print("Total de resultados {}".format(sum(df.values())))
-
-  vector_len = len_Vector(TFJson(allComplete))
-  vectorNormalice = vector_normalice(TFJson(allComplete), vector_len)
-  # for document, words in vectorNormalice.items():
-  #   for word, count in words.items():
-  #     print("La palabra {} tiene un value normalizado de {}\n".format(word, count))
-
-  unique_words = []
-  idf = IDFJson(allComplete, df)
-  result_file = open("resultado.txt", "w")
-  for document, words in TFJson(allComplete).items():
-    result_file.write("El documento {} tiene las siguientes palabaras:\n".format(document))
-    for word, count in words.items():
-      if not word in unique_words:
-        unique_words.push(word)
-      result_file.write("\tLa palabra {} aparece {} con un TF de {}\n".format(word, allComplete[document][word], round(count, 3)))
-    result_file.write("\n")
-  for word in unique_words:
-    print("La palabra {} tiene un IDF {}".format(word, idf[word]))
-
-  result_file.close()
-  # for line in lines:
-  #   print(line)
+#   document_file = "./ejemplo.txt"
+#   corpus_file = "./corpus/corpus-en.txt"
+#   stop_words_file = "./stop_words/stop-words-en.txt"
+  document_file = args.f
+  corpus_file = args.c
+  stop_words_file = args.s
+  # Leemos las stop_words y lo dejamos limpio para trabajar con ellas
+  stop_words_read = read_document(stop_words_file)
+  stop_words = stop_words_read.replace('\r', ' ').split('\n')
+  # Limpiamos el documento, es decir, le quitamos las stop_words y los ".", ",", ":", ";"
+  document_clean = clean_documents(document_file, stop_words)
+  lematizacion = Lematizar(document_clean, corpus_file)
+  matriz, words = generate_matriz(lematizacion)
+  # Generamos la matriz TF
+  matriz_tf = TF(matriz)
+  matriz_idf = idf(matriz)
+  matriz_tf_idf = matriz_TF_IDF(matriz_tf, matriz_idf)
+  len_vector = len_vectors(matriz_tf)
+  matriz_normalizada = normalizes(matriz_tf, len_vector)
+  pares = comp_doc(matriz_normalizada)
+  print(pares)
+main()
