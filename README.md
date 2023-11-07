@@ -8,7 +8,8 @@ Este repositorio contiene la implementación de un sistema recomendador que tien
 ## 📌 Introducción
 Nuestra aplicación se centra en un sofisticado sistema de recomendación basado en métodos de filtrado colaborativo. Este innovador sistema opera a través de la línea de comandos y recibe tres elementos esenciales: en primer lugar, el documento que será sometido a análisis; en segundo lugar, el corpus que alberga las palabras que se utilizarán para reemplazar ciertas términos específicos; por último, se recibe el documento que contiene las "stop_words", es decir, las palabras que se desean excluir del documento principal.
 
-Una etapa fundamental de preprocesamiento de datos implica la normalización del texto en el documento, que incluye la conversión de todas las palabras a minúsculas y la eliminación de los signos de puntuación que pudieran ser considerados molestos, para lograr un formato óptimo y uniforme.
+Una etapa fundamental de preprocesamiento de datos implica la normalización del texto en el documento, que incluye la conversión de todas las palabras a minúsculas y la eliminación de los signos de puntuación que pudieran ser considerados molestos, para lograr un formato óptimo y uniforme. 
+
 Una vez que el documento ha sido formateado adecuadamente, se procede a aplicar las operaciones definidas en los parámetros proporcionados. Esto incluye la eliminación de las "stop_words" y la lematización del texto, lo que resulta en un documento completamente preparado para su análisis y operación.
 
 ---
