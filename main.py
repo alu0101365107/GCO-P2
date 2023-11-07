@@ -108,7 +108,7 @@ def comp_doc(normalized_matrix):
   result = []
   for i in range(len(normalized_matrix)):
     for j in range(i + 1, len(normalized_matrix)):
-      result.append("Doc " + str(i + 1) + " con el " + str(j + 1) + ": " + format(similarity_cos(normalized_matrix[i], normalized_matrix[j]), ".4f"))
+      result.append("Documento " + str(i + 1) + " con el documento " + str(j + 1) + ": " + format(similarity_cos(normalized_matrix[i], normalized_matrix[j]), ".4f"))
   return result
 
 

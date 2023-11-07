@@ -49,19 +49,19 @@ analytics cloud data insight smart
 0.44700 0.37630 0.62978 0.37630 0.34695
 0.51551 0.43985 0.62177 0.39267 0.00000
 
--- Similitud coseno --
-Doc 1 con el 2: 0.8820
-Doc 1 con el 3: 0.9240
-Doc 1 con el 4: 0.8091
-Doc 1 con el 5: 0.9152
-Doc 1 con el 6: 0.8388
-Doc 2 con el 3: 0.8888
-Doc 2 con el 4: 0.9065
-Doc 2 con el 5: 0.9104
-Doc 2 con el 6: 0.8795
-Doc 3 con el 4: 0.9047
-Doc 3 con el 5: 0.9958
-Doc 3 con el 6: 0.9248
-Doc 4 con el 5: 0.9279
-Doc 4 con el 6: 0.9887
-Doc 5 con el 6: 0.9353
+-- Similitud coseno ordenada --
+Documento 3 con el documento 5: 0.9958
+Documento 4 con el documento 6: 0.9887
+Documento 5 con el documento 6: 0.9353
+Documento 4 con el documento 5: 0.9279
+Documento 3 con el documento 6: 0.9248
+Documento 1 con el documento 3: 0.9240
+Documento 1 con el documento 5: 0.9152
+Documento 2 con el documento 5: 0.9104
+Documento 2 con el documento 4: 0.9065
+Documento 3 con el documento 4: 0.9047
+Documento 2 con el documento 3: 0.8888
+Documento 1 con el documento 2: 0.8820
+Documento 2 con el documento 6: 0.8795
+Documento 1 con el documento 6: 0.8388
+Documento 1 con el documento 4: 0.8091
