@@ -20,4 +20,16 @@ Para el desarrollo de esta práctica, utilizamos las siguientes herramientas:
 - Git: La elección de Git como sistema de control de versiones garantizó una gestión eficiente de las diferentes versiones del código y facilitó la colaboración en el proyecto, además de mantener un historial completo de cambios.
 - Python: Se seleccionó Python como lenguaje de programación debido a su versatilidad y amplia comunidad de desarrollo, lo que facilitó la implementación de la práctica de manera efectiva.
 ---
-## Instalacion de dependencias 
+## 📦Instalacion de dependencias 
+Para instalar NumPy, puedes utilizar el gestor de paquetes de Python `pip`. Asegúrate de tener Python instalado en tu sistema antes de seguir estos pasos.
+
+1. Abre tu terminal o línea de comandos.
+
+2. Ejecuta el siguiente comando para instalar NumPy:
+
+Si estás utilizando un entorno virtual, asegúrate de activarlo primero.
+
+3. NumPy se descargará e instalará automáticamente en tu entorno Python.
+
+4. Para verificar que NumPy se ha instalado correctamente, puedes ejecutar el siguiente comando:
+
