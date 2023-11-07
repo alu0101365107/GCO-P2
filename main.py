@@ -6,24 +6,10 @@ import sys
 import argparse
 import functions
 
-# Funcion que lee el documento
-def read_document(document_file):
-    with open(document_file, 'r') as file:
-        content = file.read()
-    return content
-
-
-# Funcion que lee el corpus
-def read_corpus(corpus_file):
-    with open(corpus_file, 'r') as file:
-        corpus = json.load(file)
-    return corpus
-
-
 # Funcion que limpia los documentos, quitandoles las stopWords
 def clean_documents(document, stop_words):
     # Leemos el documento y lo guardamos en una variable
-    document = read_document(document)
+    document = functions.read_document(document)
     document = " " + document
     # Compruebo que si no tiene \n al final se lo añado, para saber en todo momento donde estan los articulos y pueda limpiar bien los documentos
     if not document.endswith("\n"):
@@ -43,10 +29,10 @@ def clean_documents(document, stop_words):
     return document
 
 # Funcion que lematiza el documento, es decir coge la palabra que esta en el corpus y la sustituye por la que nos indica.
-def Lematizar(document, corpus_file):
+def lematizar(document, corpus_file):
     # Leemos el documento y el corpus
     # document = readDocument(document_file)
-    corpus = functions.Read_corpus(corpus_file)
+    corpus = functions.read_corpus(corpus_file)
     # Hago un bucle que recorra el documento y si ve la palabra en el corpus la cambia por su valor
     for it, value in corpus.items():
         document = document.replace('\n' + it + " ", '\n' + value + " ")
@@ -80,45 +66,36 @@ def generate_matriz(document):
         result.append(tmpMatriz)
     return result, words
 
-# Funcion write que guarda el docuemnto en un fichero.txt para poder visualizarlo
-def write_document(document, name):
-    with open(name, 'w') as file:
-        file.write(document)
-
-def print_matriz(matriz):
-    for i in range(len(matriz)):
-        print(matriz[i])
-
 # Funcion que genera la matriz TF, segun la formula dada en los apuntes
-def TF(matriz):
-  matrizTF = []
+def get_tf(matrix):
+  matrix_tf = []
   for row in matriz:
-    auxMatrizTF = []
+    aux_matrix_tf = []
     for value in row:
       if value > 0:
-        auxMatrizTF.append(1 + math.log10(value))
+        aux_matrix_tf.append(1 + math.log10(value))
       else:
-        auxMatrizTF.append(0)
-    matrizTF.append(auxMatrizTF)
-  return matrizTF
+        aux_matrix_tf.append(0)
+    matrix_tf.append(aux_matrix_tf)
+  return matrix_tf
 
 # Funcion que genera la matriz IDF, segun la formula dada en los apuntes
-def idf(matriz_file):
-    N = len(matriz_file)
-    num_document = len(matriz_file[0])
+def get_idf(matrix_file):
+    N = len(matrix_file)
+    num_document = len(matrix_file[0])
     # Inicializar un vector IDF con ceros
     vector_idf = np.zeros(num_document)
     for j in range(num_document):
         # Contar cuántos documentos contienen el término en la columna j
-        document_with_term = sum(1 for i in range(N) if matriz_file[i][j] > 0)
+        document_with_term = sum(1 for i in range(N) if matrix_file[i][j] > 0)
         if document_with_term > 0:
             # Calcular el IDF y almacenarlo en el vector IDF
             vector_idf[j] = math.log10(N / document_with_term)
     return vector_idf
 
-def matriz_TF_IDF(matriz_tf, matriz_idf):
-    matriz_tfidf = matriz_tf * np.array(matriz_idf)
-    return matriz_tfidf
+def matriz_tf_idf(matrix_tf, matrix_idf):
+    matrix_tfidf = matrix_tf * np.array(matrix_idf)
+    return matrix_tfidf
 
 
 def similarity_cos(documet1, document2):
@@ -135,52 +112,48 @@ def comp_doc(normalized_matrix):
   return result
 
 
-def len_vectors(matriz):
-    tmpMatriz = []
-    for i in range(len(matriz)):
+def len_vectors(matrix):
+    tmp_matriz = []
+    for i in range(len(matrix)):
         value = 0
-        for j in range(len(matriz[i])):
-            value += matriz[i][j] ** 2
+        for j in range(len(matrix[i])):
+            value += matrix[i][j] ** 2
         value = math.sqrt(value)
-        tmpMatriz.append(value)
-    return tmpMatriz
+        tmp_matriz.append(value)
+    return tmp_matriz
 
-def normalizes(matriz, len_vector):
+def normalizes(matrix, len_vector):
     result = []
-    for i in range(len(matriz)):
+    for i in range(len(matrix)):
       row = []
-      for j in range(len(matriz[i])):
-        row.append(matriz[i][j] / len_vector[i])
+      for j in range(len(matrix[i])):
+        row.append(matrix[i][j] / len_vector[i])
       result.append(row)
     return result
    
 # Main del programa
-def main():
+if __name__ == "__main__":
   parser = argparse.ArgumentParser()
   parser.add_argument('--f', type=str, help='Nombre del fichero de lectura')
   parser.add_argument('--c', type=str, help='Nombre del fichero que sera usado como corpus')
   parser.add_argument('--s', type=str, help='Nombre del fichero con las stop words')
   args = parser.parse_args(sys.argv[1:])
-
-#   document_file = "./ejemplo.txt"
-#   corpus_file = "./corpus/corpus-en.txt"
-#   stop_words_file = "./stop_words/stop-words-en.txt"
   document_file = args.f
   corpus_file = args.c
   stop_words_file = args.s
+  result_file = open("result-" + args.f, "w")
   # Leemos las stop_words y lo dejamos limpio para trabajar con ellas
-  stop_words_read = read_document(stop_words_file)
+  stop_words_read = functions.read_document(stop_words_file)
   stop_words = stop_words_read.replace('\r', ' ').split('\n')
   # Limpiamos el documento, es decir, le quitamos las stop_words y los ".", ",", ":", ";"
   document_clean = clean_documents(document_file, stop_words)
-  lematizacion = Lematizar(document_clean, corpus_file)
+  lematizacion = lematizar(document_clean, corpus_file)
   matriz, words = generate_matriz(lematizacion)
   # Generamos la matriz TF
-  matriz_tf = TF(matriz)
-  matriz_idf = idf(matriz)
-  matriz_tf_idf = matriz_TF_IDF(matriz_tf, matriz_idf)
+  matriz_tf = get_tf(matriz)
+  matriz_idf = get_idf(matriz)
+  matriz_tfidf = matriz_tf_idf(matriz_tf, matriz_idf)
   len_vector = len_vectors(matriz_tf)
   matriz_normalizada = normalizes(matriz_tf, len_vector)
   pares = comp_doc(matriz_normalizada)
-  print(pares)
-main()
+  result_file = functions.write_results_file(result_file, lematizacion, words, matriz_tf, matriz_idf, matriz_tfidf, len_vector, matriz_normalizada, pares)

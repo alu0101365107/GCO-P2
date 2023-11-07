@@ -1,0 +1,67 @@
+-- Documentos lematizados --
+ analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics data data data data data data data data data data data data data data data data data data data data data data data data smart smart insight insight
+analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data cloud cloud smart
+analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data cloud cloud cloud cloud cloud cloud cloud cloud smart smart smart smart smart smart smart smart smart smart insight insight insight insight insight insight insight insight insight insight insight insight insight insight insight insight insight insight insight
+analytics analytics analytics analytics data data data data data data data data data data data data data data data data data data data data data data data data data data data data cloud cloud cloud cloud cloud insight
+analytics analytics analytics analytics analytics analytics analytics analytics data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data cloud cloud cloud cloud smart smart smart insight insight insight insight
+analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics analytics data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data data cloud cloud cloud cloud cloud cloud cloud cloud insight insight insight insight insight
+
+
+-- Palabras unicas --
+analytics cloud data insight smart
+
+-- Matriz TF --
+2.32222 0.00000 2.38021 1.30103 1.30103
+2.38021 1.30103 2.77085 0.00000 1.00000
+2.60206 1.90309 3.06070 2.27875 2.00000
+1.60206 1.69897 2.44716 1.00000 0.00000
+1.90309 1.60206 2.68124 1.60206 1.47712
+2.23045 1.90309 2.69020 1.69897 0.00000
+
+-- Matriz IDF --
+0.00000
+0.07918
+0.00000
+0.07918
+0.17609
+
+-- Matriz TF-IDF --
+0.00000 0.00000 0.00000 0.10302 0.22910
+0.00000 0.10302 0.00000 0.00000 0.17609
+0.00000 0.15069 0.00000 0.18043 0.35218
+0.00000 0.13453 0.00000 0.07918 0.00000
+0.00000 0.12685 0.00000 0.12685 0.26011
+0.00000 0.15069 0.00000 0.13453 0.00000
+
+-- Len del vector por documento --
+3.80046
+4.00446
+5.38080
+3.52728
+4.25745
+4.32670
+
+-- Matriz normalizada --
+0.61104 0.00000 0.62630 0.34234 0.34234
+0.59439 0.32490 0.69194 0.00000 0.24972
+0.48358 0.35368 0.56882 0.42350 0.37169
+0.45419 0.48167 0.69378 0.28350 0.00000
+0.44700 0.37630 0.62978 0.37630 0.34695
+0.51551 0.43985 0.62177 0.39267 0.00000
+
+-- Similitud coseno --
+Doc 1 con el 2: 0.8820
+Doc 1 con el 3: 0.9240
+Doc 1 con el 4: 0.8091
+Doc 1 con el 5: 0.9152
+Doc 1 con el 6: 0.8388
+Doc 2 con el 3: 0.8888
+Doc 2 con el 4: 0.9065
+Doc 2 con el 5: 0.9104
+Doc 2 con el 6: 0.8795
+Doc 3 con el 4: 0.9047
+Doc 3 con el 5: 0.9958
+Doc 3 con el 6: 0.9248
+Doc 4 con el 5: 0.9279
+Doc 4 con el 6: 0.9887
+Doc 5 con el 6: 0.9353
