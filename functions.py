@@ -6,13 +6,13 @@ import argparse
 
 # Funcion que lee el documento
 def read_document(document_file):
-    with open(document_file, 'r') as file:
+    with open(document_file, 'r', encoding="utf8") as file:
         content = file.read()
     return content
 
 # Funcion que lee el corpus
 def read_corpus(corpus_file):
-    with open(corpus_file, 'r') as file:
+    with open(corpus_file, 'r', encoding="utf8") as file:
         corpus = json.load(file)
     return corpus
 

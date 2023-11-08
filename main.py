@@ -147,7 +147,7 @@ if __name__ == "__main__":
   document_file = args.f
   corpus_file = args.c
   stop_words_file = args.s
-  result_file = open("result-" + args.f, "w")
+  result_file = open("result-" + args.f, "w", encoding="utf8")
   # Leemos las stop_words y lo dejamos limpio para trabajar con ellas
   stop_words_read = functions.read_document(stop_words_file)
   stop_words = stop_words_read.replace('\r', ' ').split('\n')
