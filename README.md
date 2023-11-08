@@ -39,5 +39,12 @@ También tenemos un comando que explica como ejecutar el programa
 ```shell
 $ python3 main.py --h
 ```
-
-## 
+---
+## 📄 Explicación del código
+- En `funtions` estan las funciones complementarias al codigo que sirven como apoyo
+- En `main` es donde esta el programa principal de la aplicación
+Dentro del main tenemos:
+- La frecuencia ponderada del término: `TF`
+- Inversa de la frecuencia: `IDF`
+- `TD-IDF`
+- Similaridad coceno: `comp_doc`
