@@ -32,4 +32,12 @@ Para ejecutar el programa debe ejecutar el siguiente comando:
 ```shell
 $ python3 main.py [--f] [DOCUMENT_PATH] [--c] [CORPUS_PATH] [--s] [STOP_WORDS_PATH]
 ```
-- "--f" 
+- `--f`: ruta del documento que queremos analizar.
+- `--c`: ruta del corpus que vamos a utilizar.
+- `--s`: ruta de las palabras que queremos eliminar.
+También tenemos un comando que explica como ejecutar el programa
+```shell
+$ python3 main.py --h
+```
+
+## 
