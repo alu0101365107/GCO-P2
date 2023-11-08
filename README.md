@@ -41,10 +41,9 @@ $ python3 main.py --h
 ```
 ---
 ## 📄 Explicación del código
-- En `funtions` estan las funciones complementarias al codigo que sirven como apoyo
-- En `main` es donde esta el programa principal de la aplicación
-Dentro del main tenemos:
+En `functions` se encuentran las funciones complementarias al código que sirven como soporte.
+En `main` es donde se encuentra el programa principal de la aplicación. Dentro del main, tenemos:
 - La frecuencia ponderada del término: `TF`
-- Inversa de la frecuencia: `IDF`
-- `TD-IDF`
-- Similaridad coceno: `comp_doc`
+- La inversa de la frecuencia: `IDF`
+- `TF-IDF`
+- Similaridad coseno: `comp_doc`
