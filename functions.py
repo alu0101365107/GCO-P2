@@ -4,13 +4,11 @@ import math
 import sys
 import argparse
 
-
 # Funcion que lee el documento
 def read_document(document_file):
     with open(document_file, 'r') as file:
         content = file.read()
     return content
-
 
 # Funcion que lee el corpus
 def read_corpus(corpus_file):
@@ -18,17 +16,19 @@ def read_corpus(corpus_file):
         corpus = json.load(file)
     return corpus
 
+# Funcion que printea una matriz
 def print_matriz(matriz):
     for i in range(len(matriz)):
         print(matriz[i])
 
-
+# Funcion que extrae el valor numerico de una cadena en formato clave: valor
 def get_similarity_value(entry):
     parts = entry.split(": ")
     if len(parts) == 2:
         return float(parts[1])
     return 0.0
 
+# Funcion que escribe los resultados en un fichero
 def write_results_file(result_file, lematizacion, words, matriz_tf, matriz_idf, matriz_tf_idf, len_vector, matriz_normalizada, pares):
     pares_sorted = sorted(pares, key=get_similarity_value, reverse=True)
     data_to_write = [

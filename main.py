@@ -40,6 +40,7 @@ def lematizar(document, corpus_file):
         document = document.replace(" " + it + '\n', " " + value + '\n')
     return document
 
+# Funcion que genera la matriz y el vector de palabras
 def generate_matriz(document):
     # Obtengo todas las palabras (columna)
     words = document.replace('\n', ' ').split(' ')
@@ -93,17 +94,19 @@ def get_idf(matrix_file):
             vector_idf[j] = math.log10(N / document_with_term)
     return vector_idf
 
+# Funcion que genera la matriz TF-IDF
 def matriz_tf_idf(matrix_tf, matrix_idf):
     matrix_tfidf = matrix_tf * np.array(matrix_idf)
     return matrix_tfidf
 
-
+# Funcion que calcula la similitud coseno entre dos documentos
 def similarity_cos(documet1, document2):
     value = 0
     for i in range(len(documet1)):
         value += documet1[i] * document2[i]
     return value
 
+# Funcion que calcula la similitud coseno entre todos los documentos
 def comp_doc(normalized_matrix):
   result = []
   for i in range(len(normalized_matrix)):
@@ -111,7 +114,7 @@ def comp_doc(normalized_matrix):
       result.append("Documento " + str(i + 1) + " con el documento " + str(j + 1) + ": " + format(similarity_cos(normalized_matrix[i], normalized_matrix[j]), ".4f"))
   return result
 
-
+# Funcion que calcula la longitud de los vectores, ultima cokumna de la matriz diapositiva de los apuntes numero 129
 def len_vectors(matrix):
     tmp_matriz = []
     for i in range(len(matrix)):
@@ -122,6 +125,7 @@ def len_vectors(matrix):
         tmp_matriz.append(value)
     return tmp_matriz
 
+# Funcion que normaliza la matriz
 def normalizes(matrix, len_vector):
     result = []
     for i in range(len(matrix)):
@@ -133,11 +137,13 @@ def normalizes(matrix, len_vector):
    
 # Main del programa
 if __name__ == "__main__":
+  # Leemos los argumentos pasados por terminal
   parser = argparse.ArgumentParser()
   parser.add_argument('--f', type=str, help='Nombre del fichero de lectura')
   parser.add_argument('--c', type=str, help='Nombre del fichero que sera usado como corpus')
   parser.add_argument('--s', type=str, help='Nombre del fichero con las stop words')
   args = parser.parse_args(sys.argv[1:])
+  # Guardamos los argumentos en variables
   document_file = args.f
   corpus_file = args.c
   stop_words_file = args.s
@@ -148,12 +154,16 @@ if __name__ == "__main__":
   # Limpiamos el documento, es decir, le quitamos las stop_words y los ".", ",", ":", ";"
   document_clean = clean_documents(document_file, stop_words)
   lematizacion = lematizar(document_clean, corpus_file)
+  # Generamos la matriz y el vector de palabras
   matriz, words = generate_matriz(lematizacion)
-  # Generamos la matriz TF
+  # Generamos la matriz TF, IDF, TF-IDF, la longitud de los vectores y la matriz normalizada
   matriz_tf = get_tf(matriz)
   matriz_idf = get_idf(matriz)
   matriz_tfidf = matriz_tf_idf(matriz_tf, matriz_idf)
   len_vector = len_vectors(matriz_tf)
   matriz_normalizada = normalizes(matriz_tf, len_vector)
+  # Calculamos la similitud coseno entre todos los documentos
   pares = comp_doc(matriz_normalizada)
+  # Escribimos los resultados en el fichero
   result_file = functions.write_results_file(result_file, lematizacion, words, matriz_tf, matriz_idf, matriz_tfidf, len_vector, matriz_normalizada, pares)
+  
