@@ -32,4 +32,4 @@ Para ejecutar el programa debe ejecutar el siguiente comando:
 ```shell
 $ python3 main.py [--f] [DOCUMENT_PATH] [--c] [CORPUS_PATH] [--s] [STOP_WORDS_PATH]
 ```
-- '--f' 
+- "--f" 
